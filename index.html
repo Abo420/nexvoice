@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="sv" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexVoice | Framtidens AI-receptionist</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        display: ['Space Grotesk', 'sans-serif'],
+                    },
+                    colors: {
+                        navy: '#05050A',
+                        cyan: {
+                            400: '#00f2ff',
+                            500: '#00d5e6',
+                        },
+                        purple: {
+                            500: '#8b5cf6',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #05050A;
+            color: #ffffff;
+            overflow-x: hidden;
+        }
+
+        /* Subtilt nätmönster i bakgrunden */
+        .bg-grid {
+            background-size: 50px 50px;
+            background-image: 
+                linear-gradient(to right, rgba(0, 242, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 242, 255, 0.03) 1px, transparent 1px);
+            mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
+        }
+
+        /* Glassmorphism - transparenta kort med oskärpa */
+        .glass-panel {
+            background: rgba(10, 15, 25, 0.4);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 242, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Endast hovring för funktionskorten, inte CTA-formuläret */
+        .feature-card:hover {
+            border-color: rgba(0, 242, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.15), inset 0 0 15px rgba(0, 242, 255, 0.05);
+            transform: translateY(-5px);
+        }
+
+        /* Neon-knapp */
+        .neon-btn {
+            background: transparent;
+            border: 1px solid #00f2ff;
+            color: #00f2ff;
+            text-shadow: 0 0 8px rgba(0, 242, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.2), inset 0 0 10px rgba(0, 242, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .neon-btn:hover {
+            background: rgba(0, 242, 255, 0.1);
+            box-shadow: 0 0 25px rgba(0, 242, 255, 0.4), inset 0 0 15px rgba(0, 242, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .neon-btn-solid {
+            background: #00f2ff;
+            color: #05050A;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .neon-btn-solid:hover {
+            box-shadow: 0 0 35px rgba(0, 242, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* Glödande text */
+        .text-glow {
+            text-shadow: 0 0 20px rgba(0, 242, 255, 0.4);
+        }
+
+        /* Svävande animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Pulserande ljus-blobbar */
+        @keyframes pulse-glow {
+            0% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.1); }
+            100% { opacity: 0.3; transform: scale(1); }
+        }
+        .glow-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            animation: pulse-glow 8s infinite alternate;
+        }
+
+        /* INPUT FÄLT STYLING FÖR FORMULÄRET */
+        .neon-input {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(0, 242, 255, 0.2);
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .neon-input:focus {
+            outline: none;
+            border-color: #00f2ff;
+            box-shadow: 0 0 15px rgba(0, 242, 255, 0.3);
+            background: rgba(0, 242, 255, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased relative min-h-screen flex flex-col">
+
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute inset-0 bg-grid"></div>
+        <div class="glow-blob bg-cyan-500/20 w-[500px] h-[500px] top-[-100px] left-[-100px]"></div>
+        <div class="glow-blob bg-purple-500/20 w-[600px] h-[600px] bottom-[-200px] right-[-100px]" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative z-10 flex-grow">
+        
+        <header class="container mx-auto px-6 py-6 flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <i data-lucide="audio-lines" class="text-cyan-400 w-8 h-8"></i>
+                <span class="font-display font-bold text-2xl tracking-wider text-white">NEX<span class="text-cyan-400">VOICE</span></span>
+            </div>
+            <a href="#kontakt" class="neon-btn font-display font-semibold px-6 py-2 rounded-full text-sm tracking-wide">
+                Boka Demo
+            </a>
+        </header>
+
+        <section class="container mx-auto px-6 pt-20 pb-32 flex flex-col lg:flex-row items-center gap-16">
+            <div class="lg:w-1/2 flex flex-col items-start space-y-8">
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-panel border border-cyan-400/30 text-cyan-400 text-sm font-semibold tracking-wide">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-cyan-500"></span>
+                    </span>
+                    System Online
+                </div>
+                
+                <h1 class="font-display font-bold text-5xl md:text-7xl leading-tight">
+                    Framtidens <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 text-glow">kundtjänst</span> är här.
+                </h1>
+                
+                <p class="text-gray-400 text-lg md:text-xl font-light max-w-xl leading-relaxed">
+                    Möt din nya AI-receptionist. NexVoice automatiserar dina inkommande samtal, hanterar bokningar och besvarar kundfrågor dygnet runt. Designad för moderna hantverkare, kliniker och salonger.
+                </p>
+                
+                <div class="flex flex-col sm:flex-row gap-4 pt-4 w-full sm:w-auto">
+                    <a href="#kontakt" class="neon-btn-solid font-display font-bold px-8 py-4 rounded-lg text-center flex items-center justify-center gap-2 text-lg">
+                        Uppgradera din verksamhet <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="lg:w-1/2 relative flex justify-center items-center mt-10 lg:mt-0 animate-float">
+                <div class="relative w-72 h-72 md:w-96 md:h-96">
+                    <div class="absolute inset-0 rounded-full border border-cyan-400/30 animate-[spin_10s_linear_infinite]"></div>
+                    <div class="absolute inset-4 rounded-full border border-purple-500/30 animate-[spin_15s_linear_infinite_reverse]"></div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="glass-panel w-40 h-40 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(0,242,255,0.2)]">
+                            <i data-lucide="mic" class="w-16 h-16 text-cyan-400 drop-shadow-[0_0_15px_rgba(0,242,255,0.8)] animate-pulse"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="container mx-auto px-6 py-24 relative">
+            <div class="text-center mb-16">
+                <h2 class="font-display font-bold text-3xl md:text-5xl mb-4">Varför välja NexVoice?</h2>
+                <div class="w-24 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="glass-panel feature-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 rounded-xl bg-cyan-400/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-cyan-400/20">
+                        <i data-lucide="clock-4" class="text-cyan-400 w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-xl mb-3 text-white group-hover:text-cyan-400 transition-colors">Svarar dygnet runt</h3>
+                    <p class="text-gray-400 leading-relaxed font-light">
+                        Missa aldrig en potentiell kund. NexVoice är alltid vaken, redo att ta emot samtal med oändligt tålamod, oavsett tid på dygnet.
+                    </p>
+                </div>
+
+                <div class="glass-panel feature-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 rounded-xl bg-purple-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-purple-500/20">
+                        <i data-lucide="calendar-check" class="text-purple-400 w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-xl mb-3 text-white group-hover:text-purple-400 transition-colors">Bokar direkt i din kalender</h3>
+                    <p class="text-gray-400 leading-relaxed font-light">
+                        Sömlös integration med dina system. AI:n hittar lediga tider och fyller din tidbok automatiskt medan du fokuserar på ditt arbete.
+                    </p>
+                </div>
+
+                <div class="glass-panel feature-card p-8 rounded-2xl group">
+                    <div class="w-14 h-14 rounded-xl bg-cyan-400/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300 border border-cyan-400/20">
+                        <i data-lucide="languages" class="text-cyan-400 w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-xl mb-3 text-white group-hover:text-cyan-400 transition-colors">Pratar flytande svenska</h3>
+                    <p class="text-gray-400 leading-relaxed font-light">
+                        En avancerad röstmodell som pratar naturlig och professionell svenska. Den förstår dialekter, kontext och facktermer felfritt.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="kontakt" class="container mx-auto px-6 py-32">
+            <div class="glass-panel rounded-3xl p-10 md:p-16 relative overflow-hidden max-w-5xl mx-auto border border-white/10">
+                <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[80%] h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-50"></div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-12 items-center">
+                    
+                    <div class="lg:col-span-2 text-center lg:text-left">
+                        <i data-lucide="phone-forwarded" class="w-12 h-12 text-cyan-400 mx-auto lg:mx-0 mb-6 opacity-80"></i>
+                        <h2 class="font-display font-bold text-3xl md:text-4xl mb-6 text-glow">Redo att aldrig missa ett samtal igen?</h2>
+                        <p class="text-gray-300 text-lg mb-4 font-light leading-relaxed">
+                            Boka en demo genom att fylla i dina uppgifter. Vi återkommer inom kort.
+                        </p>
+                        <p class="text-gray-500 text-sm font-light">Du kan också maila oss på nexvoicebokning@gmail.com</p>
+                    </div>
+
+                    <div class="lg:col-span-3 glass-panel p-8 rounded-2xl bg-black/20 border border-white/5">
+                        <form action="https://formspree.io/f/mqegwnvn" method="POST" class="space-y-5">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Namn</label>
+                                    <input type="text" name="name" required class="w-full neon-input rounded-lg px-4 py-3 text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Företag / Bransch</label>
+                                    <input type="text" name="company" required class="w-full neon-input rounded-lg px-4 py-3 text-sm">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">E-postadress</label>
+                                <input type="email" name="_replyto" required class="w-full neon-input rounded-lg px-4 py-3 text-sm">
+                            </div>
+                            
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-widest text-gray-500 mb-2">Meddelande / Önskemål (Valfritt)</label>
+                                <textarea name="message" rows="3" class="w-full neon-input rounded-lg px-4 py-3 text-sm"></textarea>
+                            </div>
+                            
+                            <input type="hidden" name="_subject" value="Ny bokningsförfrågan från NexVoice Webbplats">
+                            
+                            <button type="submit" class="w-full neon-btn-solid font-display font-bold py-4 rounded-xl uppercase tracking-widest text-sm flex items-center justify-center gap-2">
+                                Skicka bokningsförfrågan <i data-lucide="send" class="w-4 h-4"></i>
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <footer class="border-t border-white/5 py-8 mt-auto">
+            <div class="container mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-500 font-light">
+                <div class="flex items-center gap-2">
+                    <i data-lucide="audio-lines" class="w-5 h-5"></i>
+                    <span>&copy; 2026 NexVoice. Alla rättigheter reserverade.</span>
+                </div>
+                <div class="flex gap-6">
+                    <a href="#" class="hover:text-cyan-400 transition-colors">Integritetspolicy</a>
+                    <a href="#" class="hover:text-cyan-400 transition-colors">Villkor</a>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
